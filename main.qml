@@ -11,10 +11,14 @@ ApplicationWindow {
     height: 480
     title: qsTr("CuteTUIO")
 
+    property bool multiTouchMode: false
+
     MouseArea {
         id: ma
         anchors.fill: parent
         //hoverEnabled: true
+
+        enabled: !multiTouchMode
 
         onPressed: {
             tuio.pressed(mouseX/width, mouseY/height)
@@ -34,6 +38,29 @@ ApplicationWindow {
         }
     }
 
+    MultiPointTouchArea {
+        id: mpta
+        anchors.fill: parent
+        enabled: multiTouchMode
+        mouseEnabled: true
+
+        maximumTouchPoints: 4
+        minimumTouchPoints: 1
+
+        onUpdated: {
+
+        }
+
+        onPressed: {
+
+        }
+
+        onReleased: {
+
+        }
+
+    }
+
     Rectangle {
         id: c
         width: 10
@@ -49,17 +76,40 @@ ApplicationWindow {
         id: tuio
     }
 
+    Dialog {
+        id: dialogConnect
+        title: "Connect to host"
+        standardButtons: Dialog.Ok | Dialog.Cancel
+
+        ColumnLayout {
+            TextField {
+                placeholderText: "Host"
+                text: "localhost"
+            }
+            TextField {
+                placeholderText: "Port"
+                text: "3333"
+            }
+        }
+        onAccepted: {
+            tuio.connectServer("localhost", 3333);
+        }
+        onRejected: {
+            tuio.disconnectServer();
+        }
+    }
+
     header: ToolBar {
         RowLayout {
             ToolButton {
-                text: "Con"
+                text: "Connect"
                 enabled: true
                 onClicked: {
-                    tuio.connectServer("localhost", 3333);
+                    dialogConnect.open();
                 }
             }
             ToolButton {
-                text: "Dis"
+                text: "Disconnect"
                 enabled: true
                 onClicked: {
                     tuio.disconnectServer();
